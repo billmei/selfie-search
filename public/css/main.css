@@ -40,3 +40,8 @@
   .loading-disabled:focus {
     color: rgba(0,0,0,0);
   }
+
+#selfie {
+  width: 500px;
+  height: 500px;
+}

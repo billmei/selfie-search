@@ -18,7 +18,6 @@ module.exports = {
       img_src = gravatar;
 
       // if undefined, do stuff.
-      console.log(img_src);
       callback(img_src);
     });
   },
@@ -43,7 +42,6 @@ module.exports = {
       });
 
       response.on('end', function() {
-        // console.log(buffer);
         // TODO: Cache the image file
         callback(GRAVATAR_URL + hash);
       });
