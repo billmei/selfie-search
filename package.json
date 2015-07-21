@@ -1,0 +1,24 @@
+{
+  "name": "selfie-search",
+  "version": "0.1.0",
+  "description": "Look up your profile image by email",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "pg": "4.x",
+    "ejs": "^2.3.1",
+    "express": "~4.9.x",
+    "blueimp-md5": "~1.1.0"
+  },
+  "engines": {
+    "node": "0.12.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kortaggio/selfie-search"
+  },
+  "keywords": [],
+  "license": "MIT"
+}

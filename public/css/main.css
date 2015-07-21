@@ -1,0 +1,42 @@
+.form-control:focus {
+  border-color: #3498db;
+  outline: 0;
+}
+
+#search-form label {
+  text-align: left;
+  display: block;
+  padding-left: 5px;
+}
+  .form-group {
+    display: inline-block;
+    margin: 0 2px;
+    vertical-align: bottom;
+    text-align: center;
+  }
+
+  #profile-email {
+    width: 20em;
+  }
+
+  #search-btn {
+    display: block;
+  }
+  .loading-spinner {
+    display: inline-block;
+    position: relative;
+    opacity: 0;
+    top: 1.5em;
+    z-index: -2;
+    color: white;
+  }
+  .loading-enabled {
+    opacity: 1;
+    z-index: 20;
+  }
+  .loading-disabled,
+  .loading-disabled:hover,
+  .loading-disabled:active,
+  .loading-disabled:focus {
+    color: rgba(0,0,0,0);
+  }
