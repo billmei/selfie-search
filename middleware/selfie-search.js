@@ -1,5 +1,6 @@
 var md5 = require('blueimp-md5').md5;
-var http = require('http');
+var https = require('https');
+var pg = require('pg');
 
 module.exports = {
 
@@ -17,8 +18,17 @@ module.exports = {
 
       img_src = gravatar;
 
-      // if undefined, do stuff.
+      // if undefined, check other sites.
       callback(img_src);
+
+      /*
+      TODO: Sites to implement
+      - Facebook
+      - Google Plus
+      - Twitter
+      - LinkedIn
+      - Google Search
+      */
     });
   },
 
@@ -29,21 +39,26 @@ module.exports = {
     * @return {String} img_src
     */
   get_gravatar: function(email, callback) {
-
     var hash, GRAVATAR_URL;
-    GRAVATAR_URL = 'http://www.gravatar.com/avatar/';
+
+    GRAVATAR_URL = 'https://www.gravatar.com/avatar/';
 
     hash = md5(email);
 
-    var request = http.get(GRAVATAR_URL + hash, function(response) {
+    var request = https.get(GRAVATAR_URL + hash + '?d=404', function(response) {
       var buffer = "";
       response.on('data', function(chunk) {
         buffer += chunk;
       });
 
       response.on('end', function() {
-        // TODO: Cache the image file
-        callback(GRAVATAR_URL + hash);
+        if (response.statusCode >= 200 && response.statusCode < 400) {
+          // TODO: Cache the image file
+          callback(GRAVATAR_URL + hash);
+        } else {
+          // Gravatar does not exist
+          callback(null);
+        }
       });
 
       response.on('error', function(err) {
@@ -51,5 +66,9 @@ module.exports = {
       });
 
     });
+  },
+
+  cache_img: function(img_src) {
+
   }
 };

@@ -1,7 +1,6 @@
-var pg = require('pg');
 var express = require('express');
 var app = express();
-var selfie = require('./selfie-search.js');
+var selfie = require('./middleware/selfie-search.js');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -15,15 +14,19 @@ app.get('/', function(request, response) {
   response.render('pages/index');
 });
 
-app.use('/api/img_from_email', function(request, response, next) {
+// TODO: This isn't really REST right now, should be /api/v1/selfie/:email
+app.use('/api/v1/selfie', function(request, response, next) {
   selfie.find_img(request.query.email, function(img_src) {
     request.img_src = img_src;
     next();
   });
 });
 
-app.get('/api/img_from_email', function(request, response) {
-  response.send(request.img_src);
+app.get('/api/v1/selfie', function(request, response) {
+  response.send({
+    img_src : request.img_src,
+    success : !!request.img_src
+  });
 });
 
 app.listen(app.get('port'), function() {

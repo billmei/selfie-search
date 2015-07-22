@@ -2,7 +2,7 @@
 
 Look up your profile image by email.
 
-Built on Node.js and Express.js.
+Built on Node.js, Express.js, and Postgres.
 
 ## Running Locally
 
@@ -14,7 +14,48 @@ $ cd selfie-search
 $ npm install
 ```
 
-### Start the app:
+## Configure postgres
+
+In bash:
+
+```sh
+su
+useradd <yourusername>
+passwd <yourpassword>
+```
+
+Open `/etc/pstgresql/9.3/main/pg_hba.conf` as root and change the line
+
+	local   postgres    all    peer
+
+to
+
+	local   all         all    peer
+
+Reload postgres
+
+	sudo /etc/init.d/postgresql reload
+
+
+Create the user in postgres:
+
+```sh
+su - postgres
+psql
+```
+
+```
+postgres=# CREATE USER <yourusername>;
+postgres=# CREATE DATABASE selfiesearch;
+postgres=# GRANT ALL privileges ON DATABASE selfiesearch TO <yourusername>;
+```
+
+Open a connection to the database
+
+	psql -d selfiesearch
+
+
+## Start the app:
 
 ```sh
 $ npm start
