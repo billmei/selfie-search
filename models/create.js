@@ -1,5 +1,6 @@
 var pg = require('pg');
-var connectionString = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/selfiesearch';
+var connectionString = process.env.DATABASE_URL ||
+  'postgres://postgres:postgres@localhost:5432/selfiesearch';
 
 var client = new pg.Client(connectionString);
 client.connect();

@@ -47,12 +47,22 @@ psql
 ```
 postgres=# CREATE USER <yourusername>;
 postgres=# CREATE DATABASE selfiesearch;
-postgres=# GRANT ALL privileges ON DATABASE selfiesearch TO <yourusername>;
+postgres=# \connect selfiesearch;
+selfiesearch=# GRANT ALL privileges ON DATABASE selfiesearch TO <yourusername>;
 ```
 
-Open a connection to the database
+Set up the tables:
+
+```sh
+node models/create.js
+```
+
+
+
+To open a connection to the database, use:
 
 	psql -d selfiesearch
+
 
 
 ## Start the app:
