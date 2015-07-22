@@ -6,8 +6,8 @@
 
 <body>
 
-<div class="jumbotron">
-  <div class="container">
+<div id="card" class="jumbotron">
+  <div class="container front">
     <h1>Selfie Search</h1>
     <p>Find the profile image associated with an email address.</p>
     <form id="search-form">
@@ -20,19 +20,18 @@
         <button id="search-btn" class="btn btn-info">Search</button>
       </div>
     </form>
-
   </div>
-</div>
-<div class="container">
-  <div class="row">
-    <div class="col-xs-12">
-      <p>Here's your selfie!</p>
-      <div id="selfie"></div>
+  <div class="container back">
+    <div class="row">
+      <div class="col-xs-12">
+        <div id="selfie"></div>
+        <button id="flip-back">Try again</button>
+      </div>
     </div>
   </div>
 </div>
 
-  <% include ../partials/footer.ejs %>
+<% include ../partials/footer.ejs %>
 
 </body>
 </html>

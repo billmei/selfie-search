@@ -1,12 +1,19 @@
 $(document).ready(function() {
+  var $card = $('#card');
+  var $selfie = $('#selfie');
+  var $email = $('#profile-email');
+
+  $card.flip({
+    'trigger' : 'manual',
+  });
+
   $('#search-btn').on('click', function(event) {
     event.preventDefault();
 
     startLoadingSpinner();
 
-    var email = $('#profile-email').val();
-    var $selfie = $('#selfie');
-
+    var email = $email.val();
+    
     $.ajax({
       url: '/api/v1/selfie',
       type: 'GET',
@@ -15,7 +22,10 @@ $(document).ready(function() {
 
       if (response.success) {
         var img_src = response.img_src;
-        $selfie.append($('<img src="' + img_src + '"/>'));
+        $selfie.html($('<img src="' + img_src + '"/>'));
+
+        $card.flip(true);
+
       } else {
         alertModal("Profile image not found.", "We can't find a profile image associated with that email address.");
       }
@@ -26,6 +36,11 @@ $(document).ready(function() {
     }).always(function() {
       stopLoadingSpinner();
     });
+  });
+
+  $('#flip-back').on('click', function(event) {
+    event.preventDefault();
+    $card.flip('toggle');
   });
 
   function startLoadingSpinner() {
