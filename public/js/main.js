@@ -17,8 +17,7 @@ $(document).ready(function() {
         var img_src = response.img_src;
         $selfie.append($('<img src="' + img_src + '"/>'));
       } else {
-        // TODO: Handle not found.
-        alert("We can't find a profile image associated with that email address.");
+        alertModal("Profile image not found.", "We can't find a profile image associated with that email address.");
       }
 
     }).fail(function() {
@@ -30,14 +29,21 @@ $(document).ready(function() {
   });
 
   function startLoadingSpinner() {
-      // Start the loading spinner
-      $('.loading-spinner').addClass('loading-enabled');
-      $('#search-btn').addClass('loading-disabled');
+    // Start the loading spinner
+    $('.loading-spinner').addClass('loading-enabled');
+    $('#search-btn').addClass('loading-disabled');
   }
 
   function stopLoadingSpinner() {
-      // Stop the loading spinner
-      $('.loading-spinner').removeClass('loading-enabled');
-      $('#search-btn').removeClass('loading-disabled');
+    // Stop the loading spinner
+    $('.loading-spinner').removeClass('loading-enabled');
+    $('#search-btn').removeClass('loading-disabled');
+  }
+
+  function alertModal(title, body) {
+    // Display error message to the user in a modal
+    $('#alert-modal-title').html(title);
+    $('#alert-modal-body').html(body);
+    $('#alert-modal').modal('show');
   }
 });
