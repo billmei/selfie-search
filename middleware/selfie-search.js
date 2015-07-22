@@ -4,6 +4,8 @@ var pg = require('pg');
 var connectionString = process.env.DATABASE_URL ||
   'postgres://postgres:postgres@localhost:5432/selfiesearch';
 
+// TODO: Port the server-side code to ES6 and use Promises instead of callbacks.
+
 module.exports = {
 
   /**
