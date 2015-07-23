@@ -93,7 +93,6 @@ module.exports = {
     */
   cache_email: function(email, img_src, callback) {
     pg.connect(connectionString, function(err, client, done) {
-      // TODO: Prevent SQL injection
       client.query("INSERT INTO emails(address, img_src) values($1, $2);",
         [email, img_src]);
 
@@ -117,9 +116,8 @@ module.exports = {
     var result;
 
     pg.connect(connectionString, function(err, client, done) {
-      // TODO: Prevent SQL injection
-      var query = client.query("SELECT img_src FROM emails WHERE address = '" +
-        email + "';");
+      var query = client.query("SELECT img_src FROM emails WHERE address=$1;",
+        [email]);
 
       query.on('row', function(row) {
         result = row.img_src;
