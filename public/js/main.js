@@ -14,6 +14,12 @@ $(document).ready(function() {
     startLoadingSpinner();
 
     var email = $email.val();
+
+    if (!validateEmail(email)) {
+      alertModal("Email not valid", "That email doesn't look valid. Is there a typo?");
+      stopLoadingSpinner();
+      return;
+    }
     
     $.ajax({
       url: '/api/v1/selfie',
@@ -33,7 +39,7 @@ $(document).ready(function() {
         stopLoadingSpinner();
       }
     }).fail(function() {
-      alertModal("Server error.", "There was an error reaching the server. Perhaps there's too much traffic right now.");
+      alertModal("Server error.", "There was a sever error when looking up that email. This is probably because we've either surpassed the API limit for FullContact, or there's too much traffic, or both.");
       stopLoadingSpinner();
     });
   });
@@ -65,5 +71,11 @@ $(document).ready(function() {
     $('#alert-modal-title').html(title);
     $('#alert-modal-body').html(body);
     $('#alert-modal').modal('show');
+  }
+
+  function validateEmail (email) {
+    // Quick and simple email validation.
+    var str = /.+@.+\..+/;
+    return str.test(email);
   }
 });

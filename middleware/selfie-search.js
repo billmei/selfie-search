@@ -22,7 +22,7 @@ module.exports = {
     
     // TODO: Port the server-side code to ES6 and use Promises
     //       instead of callbacks.
-    
+
     // TODO: Fix the "callback hell".
     //       This should really be accessed either through separate endpoints
     //       or through a websocket to take full advantage of Node's concurrency.
@@ -144,6 +144,7 @@ module.exports = {
     * @param {Function} callback
     */
   cache_email: function(email, img_src, callback) {
+    // TODO: Change this to a connection pool instead of an individual query
     pg.connect(connectionString, function(err, client, done) {
       var query = client.query("INSERT INTO emails(address, img_src) VALUES($1, $2);",
         [email, img_src]);
@@ -153,11 +154,11 @@ module.exports = {
         callback();
       });
 
-      process.on('uncaughtException', function(err) {
-        // The email already exists, don't do anything.
+      if (err) {
+        console.log(err);
         client.end();
         callback();
-      });
+      }
 
     });
   },
@@ -169,7 +170,7 @@ module.exports = {
     */
   get_email: function(email, callback) {
     var result;
-
+    // TODO: Change this to a connection pool instead of an individual query
     pg.connect(connectionString, function(err, client, done) {
       var query = client.query("SELECT img_src FROM emails WHERE address=$1;",
         [email]);
@@ -183,12 +184,11 @@ module.exports = {
         callback(result);
       });
 
-      process.on('uncaughtException', function(err) {
-        // Silently fail and log the exception. (Useful for production.)
+      if (err) {
         console.log(err);
         client.end();
         callback();
-      });
+      }
 
     });
   }
