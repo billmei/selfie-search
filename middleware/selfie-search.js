@@ -36,14 +36,6 @@ module.exports = {
           img_src = gravatar;
 
           if (!img_src) {
-            /*
-            TODO: Check other sites
-            - Facebook
-            - Google Plus
-            - Twitter
-            - LinkedIn
-            - Google Search
-            */
             callback(img_src);
           } else {
             self.cache_email(email, img_src, function() {
@@ -101,7 +93,34 @@ module.exports = {
     * but none of these websites offer public API access.
     */
   fullcontact: function(email, callback) {
-    return process.env.FULLCONTACT_API_KEY;
+    var FULLCONTACT_URL = 'https://api.fullcontact.com/v2/person.json';
+
+    var request = https.get(FULLCONTACT_URL +
+      '?email=' + email +
+      '&apiKey=' + process.env.FULLCONTACT_API_KEY, function(response) {
+
+      var buffer = "";
+      response.on('data', function(chunk) {
+        buffer += chunk;
+      });
+
+      response.on('end', function() {
+        if (response.statusCode >= 200 && response.statusCode < 400) {
+          var result = JSON.parse(buffer);
+
+          callback(result.photos[0].url);
+
+        } else {
+          // Profile not found
+          callback(null);
+        }        
+      });
+
+      response.on('error', function(err) {
+        callback(undefined);
+      });
+
+    });
   },
 
   /**
@@ -112,19 +131,20 @@ module.exports = {
     */
   cache_email: function(email, img_src, callback) {
     pg.connect(connectionString, function(err, client, done) {
-      client.query("INSERT INTO emails(address, img_src) values($1, $2);",
+      var query = client.query("INSERT INTO emails(address, img_src) VALUES($1, $2);",
         [email, img_src]);
-
-      var query = client.query("SELECT * FROM emails;");
 
       query.on('end', function() {
         client.end();
         callback();
       });
 
-      if (err) {
-        console.log(err);
-      }
+      process.on('uncaughtException', function(err) {
+        // The email already exists, don't do anything.
+        client.end();
+        callback();
+      });
+
     });
   },
 
@@ -149,9 +169,12 @@ module.exports = {
         callback(result);
       });
 
-      if (err) {
+      process.on('uncaughtException', function(err) {
+        // Silently fail and log the exception. (Useful for production.)
         console.log(err);
-      }
+        client.end();
+        callback();
+      });
 
     });
   }

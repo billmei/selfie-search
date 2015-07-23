@@ -43,6 +43,11 @@ $(document).ready(function() {
     $card.flip('toggle');
   });
 
+  $('#wrong-img').on('click', function(event) {
+    event.preventDefault();
+    alertModal("Sorry!", "This feature isn't supported yet. Send in a <a href=\"https://github.com/Kortaggio/selfie-search/pulls\">pull request</a> if you have a fix?");
+  });
+
   function startLoadingSpinner() {
     // Start the loading spinner
     $('.loading-spinner').addClass('loading-enabled');
