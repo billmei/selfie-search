@@ -6,7 +6,7 @@ app.set('port', (process.env.PORT || 5000));
 
 app.use(express.static(__dirname + '/public'));
 
-// views is directory for all template files
+// Templates
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
@@ -14,7 +14,7 @@ app.get('/', function(request, response) {
   response.render('pages/index');
 });
 
-// TODO: This isn't really REST right now, should be /api/v1/selfie/:email
+// TODO: This isn't technically REST, should be /api/v1/selfie/:email
 app.use('/api/v1/selfie', function(request, response, next) {
   selfie.find_img(request.query.email, function(img_src) {
     request.img_src = img_src;

@@ -1,8 +1,8 @@
 # Selfie Search
 
-**DEMO: [http://selfie-search.herokuapp.com/](http://selfie-search.herokuapp.com/)**
+Find the profile image associated with an email address.
 
-Look up your profile image by email.
+**DEMO: [http://selfie-search.herokuapp.com/](http://selfie-search.herokuapp.com/)**
 
 Built on Node.js, Express.js, and Postgres.
 
@@ -15,19 +15,25 @@ Built on Node.js, Express.js, and Postgres.
 Make sure you have [Node.js](http://nodejs.org/) and the [Heroku Toolbelt](https://toolbelt.heroku.com/) installed.
 
 ```sh
-$ git clone git@github.com:kortaggio/selfie-search.git # or clone your own fork
+$ git clone git@github.com:kortaggio/selfie-search.git # or your own fork
 $ cd selfie-search
 $ npm install
 ```
 
-## Configure postgres
+## Database Configuration
 
-In bash:
+Install postgres:
 
 ```sh
-su
-useradd <yourusername>
-passwd <yourpassword>
+$ sudo aptitude install postgresql postgresql-contrib
+```
+
+Configure postgres:
+
+```sh
+$ su
+$ useradd <yourusername>
+$ passwd <yourpassword>
 ```
 
 Open `/etc/pstgresql/9.3/main/pg_hba.conf` as root and change the line
@@ -46,8 +52,8 @@ Reload postgres
 Create the user in postgres:
 
 ```sh
-su - postgres
-psql
+$ su - postgres
+$ psql
 ```
 
 ```
@@ -60,7 +66,7 @@ selfiesearch=# GRANT ALL privileges ON DATABASE selfiesearch TO <yourusername>;
 Set up the tables:
 
 ```sh
-node models/create.js
+$ node models/create.js
 ```
 
 To open a connection to the database, use:
@@ -70,30 +76,16 @@ To open a connection to the database, use:
 
 ## Third party APIs
 
-This app requires an API key from [FullContact](https://www.fullcontact.com/). Once you have a key, create an `.env` file in the root folder and save your key to this file:
+This app requires an API key from [FullContact](https://www.fullcontact.com/). Sign up for an account to get a key, then create an `.env` file in the root folder and save your key:
 
 	FULLCONTACT_API_KEY=<your-api-key-here>
 
 
-## Start the app:
+## Run
 
 ```sh
 $ npm start
 ```
 
-or if you have the Heroku Toolbelt installed:
-
-```sh
-$ foreman start web
-```
-
 Your app should now be running on [localhost:5000](http://localhost:5000/).
-
-## Deploying to Heroku
-
-```
-$ heroku create
-$ git push heroku master
-$ heroku open
-```
 

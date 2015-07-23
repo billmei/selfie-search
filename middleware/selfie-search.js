@@ -24,7 +24,7 @@ module.exports = {
     var responses = [];
     var sites = [
       self.gravatar,
-      self.facebook
+      self.fullcontact
     ];
 
     // Check if email exists in database first
