@@ -1,8 +1,14 @@
 # Selfie Search
 
+**DEMO: [http://selfie-search.herokuapp.com/](http://selfie-search.herokuapp.com/)**
+
 Look up your profile image by email.
 
 Built on Node.js, Express.js, and Postgres.
+
+## Architecture
+
+[![](http://i.imgur.com/oH1KY2b.png)](https://docs.google.com/drawings/d/1WOe29v3Ka4zwd5yDdRu7bBWAjWM1eoS1wPpJVAo4YSE)
 
 ## Running Locally
 
@@ -57,12 +63,16 @@ Set up the tables:
 node models/create.js
 ```
 
-
-
 To open a connection to the database, use:
 
 	psql -d selfiesearch
 
+
+## Third party APIs
+
+This app requires an API key from [FullContact](https://www.fullcontact.com/). Once you have a key, create an `.env` file in the root folder and save your key to this file:
+
+	FULLCONTACT_API_KEY=<your-api-key-here>
 
 
 ## Start the app:

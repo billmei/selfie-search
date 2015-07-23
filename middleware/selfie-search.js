@@ -1,3 +1,4 @@
+require('dotenv').load();
 var md5 = require('blueimp-md5').md5;
 var https = require('https');
 var pg = require('pg');
@@ -13,19 +14,25 @@ module.exports = {
   /**
     * Find someone's profile image given their email.
     *
-    * @param  {String} email
-    * @return {String} img_src
+    * @param {String}   email
+    * @param {Function} callback
     */
   find_img: function(email, callback) {
     var img_src;
     var self = this;
     
+    var responses = [];
+    var sites = [
+      self.gravatar,
+      self.facebook
+    ];
+
     // Check if email exists in database first
     self.get_email(email, function(img_src) {
       if (!img_src) {
 
         // Try checking gravatar
-        self.get_gravatar(email, function(gravatar) {
+        self.gravatar(email, function(gravatar) {
           img_src = gravatar;
 
           if (!img_src) {
@@ -54,12 +61,12 @@ module.exports = {
   },
 
   /**
-    * Returns the Gravatar image of an email, if it exists
+    * Gets the Gravatar image of an email, if it exists
     *
-    * @param  {String} email
-    * @return {String} img_src
+    * @param {String}   email
+    * @param {Function} callback
     */
-  get_gravatar: function(email, callback) {
+  gravatar: function(email, callback) {
     var hash, GRAVATAR_URL;
 
     GRAVATAR_URL = 'https://www.gravatar.com/avatar/';
@@ -89,7 +96,19 @@ module.exports = {
   },
 
   /**
+    * 
+    * The original plan was to scrape Facebook, G+, Twitter, etc. directly
+    * but none of these websites offer public API access.
+    */
+  fullcontact: function(email, callback) {
+    return process.env.FULLCONTACT_API_KEY;
+  },
+
+  /**
     * Cache a given email and img pair into the database for later retrieval
+    * @param {String}   email
+    * @param {String}   img_src
+    * @param {Function} callback
     */
   cache_email: function(email, img_src, callback) {
     pg.connect(connectionString, function(err, client, done) {
@@ -111,6 +130,8 @@ module.exports = {
 
   /**
     * Retrieve a cached image from the database given an email
+    * @param {String}   email
+    * @param {Function} callback
     */
   get_email: function(email, callback) {
     var result;
