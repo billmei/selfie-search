@@ -4,6 +4,8 @@ var pg = require('pg');
 var connectionString = process.env.DATABASE_URL ||
   'postgres://postgres:postgres@localhost:5432/selfiesearch';
 
+var IMG_SIZE = 310;
+
 // TODO: Port the server-side code to ES6 and use Promises instead of callbacks.
 
 module.exports = {
@@ -72,7 +74,7 @@ module.exports = {
 
       response.on('end', function() {
         if (response.statusCode >= 200 && response.statusCode < 400) {
-          callback(GRAVATAR_URL + hash);
+          callback(GRAVATAR_URL + hash + '?s=' + IMG_SIZE);
         } else {
           // Gravatar does not exist
           callback(null);

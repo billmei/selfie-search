@@ -23,18 +23,17 @@ $(document).ready(function() {
 
       if (response.success) {
         var img_src = response.img_src;
-        $selfie.attr('src', img_src);
-
-        $card.flip(true);
-
+        $selfie.attr('src', img_src).load(function() {
+          // Wait for image to download before displaying it.
+          $card.flip(true);
+          stopLoadingSpinner();
+        });
       } else {
         alertModal("Profile image not found.", "We can't find a profile image associated with that email address.");
+        stopLoadingSpinner();
       }
-
     }).fail(function() {
-      // TODO: Handle error
-      console.log("error");
-    }).always(function() {
+      alertModal("Server error.", "There was an error reaching the server. Perhaps there's too much traffic right now.");
       stopLoadingSpinner();
     });
   });
