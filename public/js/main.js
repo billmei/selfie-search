@@ -74,7 +74,8 @@ $(document).ready(function() {
   }
 
   function validateEmail (email) {
-    // Quick and simple email validation.
+    // Quick and simple email validation. Don't need to implement full RFC 5322,
+    // just check that it has an @ symbol and a . symbol.
     var str = /.+@.+\..+/;
     return str.test(email);
   }
