@@ -7,7 +7,6 @@ var connectionString = process.env.DATABASE_URL ||
 
 var IMG_SIZE = 310;
 
-// TODO: Port the server-side code to ES6 and use Promises instead of callbacks.
 
 module.exports = {
 
@@ -21,11 +20,15 @@ module.exports = {
     var img_src;
     var self = this;
     
-    var responses = [];
-    var sites = [
-      self.gravatar,
-      self.fullcontact
-    ];
+    // TODO: Port the server-side code to ES6 and use Promises
+    //       instead of callbacks.
+    
+    // TODO: Fix the "callback hell".
+    //       This should really be accessed either through separate endpoints
+    //       or through a websocket to take full advantage of Node's concurrency.
+    //       That way we can make async requests to each service and let them
+    //       come back to the user asynchronously instead of waiting until the
+    //       last one is done before returning.
 
     // Check if email exists in database first
     self.get_email(email, function(img_src) {
@@ -34,21 +37,32 @@ module.exports = {
         // Try checking gravatar
         self.gravatar(email, function(gravatar) {
           img_src = gravatar;
-
           if (!img_src) {
+
+            // Try checking fullcontact
+            self.fullcontact(email, function(profile_img) {
+              img_src = profile_img;
+              if (!img_src) {
+                callback(img_src);
+              } else {
+                self.cache_email(email, img_src, function() {
+                  callback(img_src);
+                });
+              }
+            }); // end fullcontact
+
             callback(img_src);
           } else {
             self.cache_email(email, img_src, function() {
               callback(img_src);
             });
           }
-
-        });
+        }); // end gravatar
 
       } else {
         callback(img_src);
       }
-    });
+    }); // end DB call
     
   },
 
