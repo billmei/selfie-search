@@ -83,5 +83,6 @@ footer {
   background-color: #f5f5f5;
 }
   .attribution {
+    padding-top: 2px;
     height: 25px;
   }
