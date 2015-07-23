@@ -6,6 +6,7 @@ $(document).ready(function() {
   $card.flip({
     'trigger' : 'manual',
   });
+  $card.children('.hidden').removeClass('hidden');
 
   $('#search-btn').on('click', function(event) {
     event.preventDefault();
@@ -22,7 +23,7 @@ $(document).ready(function() {
 
       if (response.success) {
         var img_src = response.img_src;
-        $selfie.html($('<img src="' + img_src + '"/>'));
+        $selfie.attr('src', img_src);
 
         $card.flip(true);
 

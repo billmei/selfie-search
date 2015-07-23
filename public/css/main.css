@@ -1,8 +1,26 @@
+body {
+  background-color: #ecf0f1;
+}
+
+#card {
+  width: 450px;
+  height: 512px;
+  margin: 60px auto;
+}
+  #card .front,
+  #card .back {
+    padding: 1em;
+  }
+
 .form-control:focus {
   border-color: #3498db;
   outline: 0;
 }
 
+#search-form {
+  text-align: center;
+  padding-top: 1em;
+}
 #search-form label {
   text-align: left;
   display: block;
@@ -10,7 +28,7 @@
 }
   .form-group {
     display: inline-block;
-    margin: 0 2px;
+    margin: 2em 2px;
     vertical-align: bottom;
     text-align: center;
   }
@@ -41,7 +59,12 @@
     color: rgba(0,0,0,0);
   }
 
-#selfie {
-  width: 500px;
-  height: 500px;
+.back {
+  text-align: center;
 }
+  #selfie {
+    width: 310px;
+    height: 310px;
+    margin: 2em auto;
+    display: block;
+  }
