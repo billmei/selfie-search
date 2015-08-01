@@ -4,14 +4,15 @@
   "description": "Look up your profile image by email",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node --harmony index.js"
   },
   "dependencies": {
     "pg": "4.x",
     "ejs": "^2.3.1",
     "express": "~4.9.x",
     "blueimp-md5": "~1.1.0",
-    "dotenv": "~1.2.0"
+    "dotenv": "~1.2.0",
+    "q": "~1.4.1"
   },
   "engines": {
     "node": "0.12.2"
