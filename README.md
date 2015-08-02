@@ -50,8 +50,9 @@ to
 
 Reload postgres
 
-	sudo /etc/init.d/postgresql reload
-
+```sh
+$ sudo /etc/init.d/postgresql reload
+```
 
 Create the user in postgres:
 
@@ -75,8 +76,9 @@ $ node models/create.js
 
 To open a connection to the database, use:
 
-	psql -d selfiesearch
-
+```sh
+$ psql -d selfiesearch
+```
 
 ## Third party APIs
 
