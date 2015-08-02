@@ -17,17 +17,16 @@ app.get('/', function(request, response) {
 
 // TODO: This isn't technically REST, should be /api/v1/selfie/:email
 app.use('/api/v1/selfie', function(request, response, next) {
-  selfie.find_img(request.query.email, function(img_src) {
-    console.log("called back.");
-    request.img_src = img_src;
+  selfie.findImg(request.query.email, function(imgSRC) {
+    request.imgSRC = imgSRC;
     next();
   });
 });
 
 app.get('/api/v1/selfie', function(request, response) {
   response.send({
-    img_src : request.img_src,
-    success : !!request.img_src
+    imgSRC : request.imgSRC,
+    success : !!request.imgSRC
   });
 });
 

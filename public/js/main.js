@@ -28,8 +28,8 @@ $(document).ready(function() {
     }).done(function(response) {
 
       if (response.success) {
-        var img_src = response.img_src;
-        $selfie.attr('src', img_src).load(function() {
+        var imgSRC = response.imgSRC;
+        $selfie.attr('src', imgSRC).load(function() {
           // Wait for image to download before displaying it.
           $card.flip(true);
           stopLoadingSpinner();
