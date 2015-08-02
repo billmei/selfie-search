@@ -20,21 +20,23 @@ module.exports = {
     var img_src;
     var self = this;
 
-    self.get_from_db(email)
-      .catch(function(result) {
-        console.log("First exception caught! Result is: " + result);
-        img_src = self.get_gravatar(email);
-      })
-      .catch(function(result) {
-        console.log("Second exception caught! Result is: " + result);
-        img_src = self.get_fullcontact(email);
-      })
-      .catch(function(result) {
-        console.log("Third exception caught! Result is: " + result);
-        img_src = undefined;
-      })
-      .then(self.cache_email(email, img_src))
-      .done(callback(img_src), callback(img_src));
+    Q.all(self.get_from_db(email))
+      // .catch(function(result) {
+      //   console.log("First exception caught! Result is: " + result);
+      //   img_src = self.get_gravatar(email);
+      // })
+      // .catch(function(result) {
+      //   console.log("Second exception caught! Result is: " + result);
+      //   img_src = self.get_fullcontact(email);
+      // })
+      // .catch(function(result) {
+      //   console.log("Third exception caught! Result is: " + result);
+      //   img_src = undefined;
+      // })
+      // .then(self.cache_email(email, img_src))
+      .done(function(img_src){
+        callback(img_src);
+      });
   },
 
   /**
@@ -63,7 +65,6 @@ module.exports = {
 
 
         console.log("found email in database, img_src is: " + result);
-
 
         deferred.resolve(result);
       });
