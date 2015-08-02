@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var selfie = require('./middleware/selfie-search.js');
+var Q = require('q');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -16,16 +17,16 @@ app.get('/', function(request, response) {
 
 // TODO: This isn't technically REST, should be /api/v1/selfie/:email
 app.use('/api/v1/selfie', function(request, response, next) {
-  selfie.find_img(request.query.email, function(img_src) {
-    request.img_src = img_src;
+  selfie.findImg(request.query.email, function(imgSRC) {
+    request.imgSRC = imgSRC;
     next();
   });
 });
 
 app.get('/api/v1/selfie', function(request, response) {
   response.send({
-    img_src : request.img_src,
-    success : !!request.img_src
+    imgSRC : request.imgSRC,
+    success : !!request.imgSRC
   });
 });
 
