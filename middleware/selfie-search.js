@@ -20,32 +20,28 @@ module.exports = {
     var img_src;
     var self = this;
 
-    Q
-      .try(self.get_email(email))
-      .catch(function(email) {
-        img_src = self.gravatar(email);
+    self.get_from_db(email)
+      .catch(function(result) {
+        console.log("First exception caught! Result is: " + result);
+        img_src = self.get_gravatar(email);
       })
-      .catch(function(email) {
-        img_src = self.fullcontact(email);
+      .catch(function(result) {
+        console.log("Second exception caught! Result is: " + result);
+        img_src = self.get_fullcontact(email);
       })
-      .catch(function(email) {
+      .catch(function(result) {
+        console.log("Third exception caught! Result is: " + result);
         img_src = undefined;
       })
-      .done(function(email) {
-        if (img_src) {
-          self.cache_email(email);
-          callback(img_src);
-        } else {
-          callback(undefined);
-        }
-      });    
+      .then(self.cache_email(email, img_src))
+      .done(callback(img_src), callback(img_src));
   },
 
   /**
     * Retrieve a cached image from the database given an email
     * @param {String} email
     */
-  get_email: function(email) {
+  get_from_db: function(email) {
     var deferred = Q.defer();
 
 
@@ -74,7 +70,6 @@ module.exports = {
 
       if (err) {
 
-
         console.log("could not find email in database. Error is: " + err);
 
 
@@ -91,7 +86,7 @@ module.exports = {
     *
     * @param {String} email
     */
-  gravatar: function(email) {
+  get_gravatar: function(email) {
     var deferred = Q.defer();
     var hash, GRAVATAR_URL;
 
@@ -135,9 +130,9 @@ module.exports = {
 
         deferred.reject(new Error("Error reaching Gravatar, their website may be down."));
       });
-
-      return deferred.promise;
     });
+
+    return deferred.promise;
   },
 
   /**
@@ -148,7 +143,7 @@ module.exports = {
     *
     * @param {String} email
     */
-  fullcontact: function(email) {
+  get_fullcontact: function(email) {
     var deferred = Q.defer();
     var FULLCONTACT_URL = 'https://api.fullcontact.com/v2/person.json';
 
@@ -193,9 +188,9 @@ module.exports = {
 
         deferred.reject(new Error("Error reaching FullContact, their website may be down."));
       });
-
-      return deferred.promise;
     });
+
+    return deferred.promise;
   },
 
   /**
@@ -206,14 +201,18 @@ module.exports = {
   cache_email: function(email, img_src) {
     var deferred = Q.defer();
 
-
     console.log("Caching result in database. Email is: " + email + " and img_src is: " + img_src);
 
+    if (!img_src) {
+      deferred.reject(new Error("No img_src provided. When trying to cache."));
+    }
 
     // TODO: Change this to a connection pool instead of an individual query
     pg.connect(connectionString, function(err, client, done) {
       var query = client.query("INSERT INTO emails(address, img_src) VALUES($1, $2);",
-        [email, img_src]);
+        [email, img_src], function(error, result) {
+
+        });
 
       query.on('end', function() {
         client.end();
@@ -234,9 +233,9 @@ module.exports = {
 
         deferred.reject(new Error("Error writing to database."));
       }
-
-      return deferred.promise;
     });
+
+    return deferred.promise;
   },
 
 };
