@@ -4,7 +4,7 @@
   "description": "Look up your profile image by email",
   "main": "index.js",
   "scripts": {
-    "start": "node --harmony index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "pg": "4.x",

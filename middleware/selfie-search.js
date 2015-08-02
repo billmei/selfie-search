@@ -5,8 +5,7 @@ var pg = require('pg');
 var connectionString = process.env.DATABASE_URL ||
   'postgres://postgres:postgres@localhost:5432/selfiesearch';
 
-var Q = require('qtree');
-
+var Q = require('q');
 var IMG_SIZE = 310;
 
 module.exports = {
@@ -21,16 +20,70 @@ module.exports = {
     var img_src;
     var self = this;
 
-    // https://www.npmjs.com/package/q
-    // https://github.com/kriskowal/q
-    // https://github.com/Redsandro/qtree
-    // https://github.com/kriskowal/q/issues/308
-
     Q
-      .fcall(self.get_email(email))
-      .then(self.gravatar)
-      .then(self.fullcontact)
+      .try(self.get_email(email))
+      .catch(function(email) {
+        img_src = self.gravatar(email);
+      })
+      .catch(function(email) {
+        img_src = self.fullcontact(email);
+      })
+      .catch(function(email) {
+        img_src = undefined;
+      })
+      .done(function(email) {
+        if (img_src) {
+          self.cache_email(email);
+          callback(img_src);
+        } else {
+          callback(undefined);
+        }
+      });    
+  },
+
+  /**
+    * Retrieve a cached image from the database given an email
+    * @param {String} email
+    */
+  get_email: function(email) {
+    var deferred = Q.defer();
+
+
+    console.log("searching database with email: " + email);
+
     
+    var result;
+    // TODO: Change this to a connection pool instead of an individual query
+    pg.connect(connectionString, function(err, client, done) {
+      var query = client.query("SELECT img_src FROM emails WHERE address=$1;",
+        [email]);
+
+      query.on('row', function(row) {
+        result = row.img_src;
+      });
+
+      query.on('end', function() {
+        client.end();
+
+
+        console.log("found email in database, img_src is: " + result);
+
+
+        deferred.resolve(result);
+      });
+
+      if (err) {
+
+
+        console.log("could not find email in database. Error is: " + err);
+
+
+        client.end();
+        deferred.reject(new Error("Error reading from database."));
+      }
+    });
+
+    return deferred.promise;
   },
 
   /**
@@ -39,32 +92,51 @@ module.exports = {
     * @param {String} email
     */
   gravatar: function(email) {
-    return Q.promise(function(resolve, reject, notify) {
-      var hash, GRAVATAR_URL;
+    var deferred = Q.defer();
+    var hash, GRAVATAR_URL;
 
-      GRAVATAR_URL = 'https://www.gravatar.com/avatar/';
 
-      hash = md5(email);
+    console.log("searching gravatar with email: " + email);
 
-      var request = https.get(GRAVATAR_URL + hash + '?d=404', function(response) {
-        var buffer = "";
-        response.on('data', function(chunk) {
-          buffer += chunk;
-        });
 
-        response.on('end', function() {
-          if (response.statusCode >= 200 && response.statusCode < 400) {
-            resolve(GRAVATAR_URL + hash + '?s=' + IMG_SIZE);
-          } else {
-            reject(new Error("A Gravatar could not be found for that email."));
-          }
-        });
+    GRAVATAR_URL = 'https://www.gravatar.com/avatar/';
 
-        response.on('error', function(err) {
-          reject(new Error("Error reaching Gravatar, their website may be down."));
-        });
+    hash = md5(email);
 
+    var request = https.get(GRAVATAR_URL + hash + '?d=404', function(response) {
+      var buffer = "";
+      response.on('data', function(chunk) {
+        buffer += chunk;
       });
+
+      response.on('end', function() {
+        if (response.statusCode >= 200 && response.statusCode < 400) {
+
+
+          console.log("found gravatar, URL is: " + GRAVATAR_URL + hash + '?s=' + IMG_SIZE);
+
+
+          deferred.resolve(GRAVATAR_URL + hash + '?s=' + IMG_SIZE);
+        } else {
+
+
+          console.log("Could not find gravatar.");
+
+
+          deferred.reject(new Error("A Gravatar could not be found for that email."));
+        }
+      });
+
+      response.on('error', function(err) {
+
+
+        console.log("Could not reach gravatar. Error is: " + err);
+
+
+        deferred.reject(new Error("Error reaching Gravatar, their website may be down."));
+      });
+
+      return deferred.promise;
     });
   },
 
@@ -77,34 +149,52 @@ module.exports = {
     * @param {String} email
     */
   fullcontact: function(email) {
-    return Q.Promise(function(resolve, reject, notify) {
-      var FULLCONTACT_URL = 'https://api.fullcontact.com/v2/person.json';
+    var deferred = Q.defer();
+    var FULLCONTACT_URL = 'https://api.fullcontact.com/v2/person.json';
 
-      var request = https.get(FULLCONTACT_URL +
-        '?email=' + email +
-        '&apiKey=' + process.env.FULLCONTACT_API_KEY, function(response) {
 
-        var buffer = "";
-        response.on('data', function(chunk) {
-          buffer += chunk;
-        });
+    console.log("searching fullcontact with email: " + email);
 
-        response.on('end', function() {
-          if (response.statusCode >= 200 && response.statusCode < 400) {
-            var result = JSON.parse(buffer);
 
-            resolve(result.photos[0].url);
+    var request = https.get(FULLCONTACT_URL +
+      '?email=' + email +
+      '&apiKey=' + process.env.FULLCONTACT_API_KEY, function(response) {
 
-          } else {
-            reject(new Error("Could not find a profile image associated with that email address."));
-          }        
-        });
-
-        response.on('error', function(err) {
-          reject(new Error("Error reaching FullContact, their website may be down."));
-        });
-
+      var buffer = "";
+      response.on('data', function(chunk) {
+        buffer += chunk;
       });
+
+      response.on('end', function() {
+        if (response.statusCode >= 200 && response.statusCode < 400) {
+          var result = JSON.parse(buffer);
+
+
+          console.log("Found email in fullcontact, URL is: " + result.photos[0].url);
+
+
+          deferred.resolve(result.photos[0].url);
+
+        } else {
+
+
+          console.log("Could not find email in fullcontact.");
+
+
+          deferred.reject(new Error("Could not find a profile image associated with that email address."));
+        }        
+      });
+
+      response.on('error', function(err) {
+
+
+        console.log("Could not reach fullcontact. Error is: " + err);
+
+
+        deferred.reject(new Error("Error reaching FullContact, their website may be down."));
+      });
+
+      return deferred.promise;
     });
   },
 
@@ -114,56 +204,39 @@ module.exports = {
     * @param {String} img_src
     */
   cache_email: function(email, img_src) {
-    return Q.Promise(function(resolve, reject, notify) {
-      // TODO: Change this to a connection pool instead of an individual query
-      pg.connect(connectionString, function(err, client, done) {
-        var query = client.query("INSERT INTO emails(address, img_src) VALUES($1, $2);",
-          [email, img_src]);
+    var deferred = Q.defer();
 
-        query.on('end', function() {
-          client.end();
-          resolve();
-        });
 
-        if (err) {
-          console.log(err);
-          client.end();
-          reject(new Error("Error writing to database."));
-        }
+    console.log("Caching result in database. Email is: " + email + " and img_src is: " + img_src);
 
+
+    // TODO: Change this to a connection pool instead of an individual query
+    pg.connect(connectionString, function(err, client, done) {
+      var query = client.query("INSERT INTO emails(address, img_src) VALUES($1, $2);",
+        [email, img_src]);
+
+      query.on('end', function() {
+        client.end();
+
+
+        console.log("Finished caching result in database.");
+
+
+        deferred.resolve();
       });
+
+      if (err) {
+        client.end();
+
+
+        console.log("Could not write to database. Error is: " + err);
+
+
+        deferred.reject(new Error("Error writing to database."));
+      }
+
+      return deferred.promise;
     });
   },
 
-  /**
-    * Retrieve a cached image from the database given an email
-    * @param {String} email
-    */
-  get_email: function(email) {
-    return Q.Promise(function(resolve, reject, notify) {
-      var result;
-      // TODO: Change this to a connection pool instead of an individual query
-      pg.connect(connectionString, function(err, client, done) {
-        var query = client.query("SELECT img_src FROM emails WHERE address=$1;",
-          [email]);
-
-        query.on('row', function(row) {
-          result = row.img_src;
-        });
-
-        query.on('end', function() {
-          client.end();
-          resolve(result);
-        });
-
-        if (err) {
-          console.log(err);
-          client.end();
-          reject(new Error("Error reading from database."));
-        }
-
-      });
-    });
-    
-  }
 };
