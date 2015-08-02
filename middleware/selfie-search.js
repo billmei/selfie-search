@@ -53,6 +53,7 @@ module.exports = {
     var deferred = Q.defer();
     var result;
 
+    // TODO: Refresh DB entry if it hasn't been updated in 30 days.
     // TODO: Change this to a connection pool instead of an individual query
     pg.connect(connectionString, function(err, client, done) {
       var query = client.query("SELECT img_src FROM emails WHERE address=$1;",
@@ -129,9 +130,11 @@ module.exports = {
     var deferred = Q.defer();
     var FULLCONTACT_URL = 'https://api.fullcontact.com/v2/person.json';
 
-    var request = https.get(FULLCONTACT_URL +
+    var request = https.get(
+      FULLCONTACT_URL +
       '?email=' + email +
-      '&apiKey=' + process.env.FULLCONTACT_API_KEY, function(response) {
+      '&apiKey=' + process.env.FULLCONTACT_API_KEY,
+      function(response) {
 
       var buffer = "";
 
