@@ -148,7 +148,12 @@ module.exports = {
             response.statusCode !== 202) {
 
           var result = JSON.parse(buffer);
-          deferred.resolve(result.photos[0].url);
+
+          if (result.photos) {
+            deferred.resolve(result.photos[0].url);
+          } else {
+            deferred.reject("Could not find a profile image associated with that email address.");
+          }
 
         } else {
           deferred.reject("Could not find a profile image associated with that email address.");
