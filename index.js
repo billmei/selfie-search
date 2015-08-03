@@ -1,7 +1,6 @@
 var express = require('express');
 var app = express();
 var selfie = require('./middleware/selfie-search.js');
-var Q = require('q');
 
 app.set('port', (process.env.PORT || 5000));
 
