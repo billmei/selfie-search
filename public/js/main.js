@@ -35,7 +35,7 @@ $(document).ready(function() {
           stopLoadingSpinner();
         });
       } else {
-        alertModal("Profile image not found.", "We can't find a profile image associated with that email address.");
+        alertModal("Profile image not found.", "We can't find a profile image associated with that email address. This app works better for people who have strong social media presences, so it could be that you're not very active on social media.");
         stopLoadingSpinner();
       }
     }).fail(function() {
