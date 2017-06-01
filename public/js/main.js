@@ -51,7 +51,7 @@ $(document).ready(function() {
 
   $('#wrong-img').on('click', function(event) {
     event.preventDefault();
-    alertModal("Sorry!", "This feature isn't supported yet. Send in a <a href=\"https://github.com/Kortaggio/selfie-search/pulls\">pull request</a> if you have a fix?");
+    alertModal("Sorry!", "This feature isn't supported yet. Send in a <a href=\"https://github.com/billmei/selfie-search/pulls\">pull request</a> if you have a fix?");
   });
 
   function startLoadingSpinner() {
