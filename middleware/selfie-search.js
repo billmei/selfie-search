@@ -18,26 +18,22 @@ module.exports = {
     */
   findImg: function(email, callback) {
     var imgSRC;
-    var needsCache = false;
     var self = this;
 
     self.getFromDB(email)
       .catch(function() {
-        needsCache = true;
         return self.getGravatar(email);
       })
       .catch(function() {
-        needsCache = true;
         return self.getFullContact(email);
       })
       .catch(function() {
-        needsCache = false;
         return Q.Promise(function(resolve){return resolve(null);});
       })
       .then(function(imgSRC) {
-        if (needsCache) {
-          return self.cacheEmail(email, imgSRC);
-        }
+        // if (needsCache) {
+        //   return self.cacheEmail(email, imgSRC);
+        // }
         return Q.Promise(function(resolve){return resolve(imgSRC);});
       })
       .done(function(imgSRC) {
@@ -55,31 +51,34 @@ module.exports = {
 
     // TODO: Refresh DB entry if it hasn't been updated in 30 days.
     // TODO: Change this to a connection pool instead of an individual query
-    pg.connect(connectionString, function(err, client, done) {
-      var query = client.query("SELECT img_src FROM emails WHERE address=$1;",
-        [email]);
 
-      query.on('row', function(row) {
-        result = row.img_src;
-      });
+    // Commented out to disable caching
+    // pg.connect(connectionString, function(err, client, done) {
+    //   var query = client.query("SELECT img_src FROM emails WHERE address=$1;",
+    //     [email]);
 
-      query.on('end', function() {
-        client.end();
+    //   query.on('row', function(row) {
+    //     result = row.img_src;
+    //   });
 
-        if (result) {
-          deferred.resolve(result);
-        } else {
-          deferred.reject("Could not find email in database.");
-        }
-      });
+    //   query.on('end', function() {
+    //     client.end();
 
-      if (err) {
-        client.end();
-        deferred.reject("Error reading from database.");
-      }
+    //     if (result) {
+    //       deferred.resolve(result);
+    //     } else {
+    //       deferred.reject("Could not find email in database.");
+    //     }
+    //   });
 
-    });
+    //   if (err) {
+    //     client.end();
+    //     deferred.reject("Error reading from database.");
+    //   }
 
+    // });
+
+    deferred.reject("Database caching is disabled.");
     return deferred.promise;
   },
 
@@ -181,20 +180,22 @@ module.exports = {
       deferred.reject("No imgSRC provided. When trying to cache.");
     } else {
       // TODO: Change this to a connection pool instead of an individual query
-      pg.connect(connectionString, function(err, client, done) {
-        var query = client.query("INSERT INTO emails(address, img_src) VALUES($1, $2);",
-          [email, imgSRC]);
 
-        query.on('end', function() {
-          client.end();
-          deferred.resolve(imgSRC);
-        });
+      // Commented out to disable caching
+      // pg.connect(connectionString, function(err, client, done) {
+      //   var query = client.query("INSERT INTO emails(address, img_src) VALUES($1, $2);",
+      //     [email, imgSRC]);
 
-        if (err) {
-          client.end();
-          deferred.reject("Error writing to database.");
-        }
-      });
+      //   query.on('end', function() {
+      //     client.end();
+      //     deferred.resolve(imgSRC);
+      //   });
+
+      //   if (err) {
+      //     client.end();
+      //     deferred.reject("Error writing to database.");
+      //   }
+      // });
     }
 
     return deferred.promise;

@@ -12,8 +12,6 @@ Built on Node.js, Express.js, and Postgres.
 
 Profile images are searched first through Gravatar, then after through FullContact. The original plan was to scrape Facebook, G+, Twitter, etc. directly but none of these websites offer public API access.
 
-Results are cached in Postgres to speed up future calls on the same email.
-
 ## Running Locally
 
 Make sure you have [Node.js](http://nodejs.org/) installed.
