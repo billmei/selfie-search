@@ -15,7 +15,7 @@
     "q": "~1.4.1"
   },
   "engines": {
-    "node": "0.12.2"
+    "node": "4.8.4"
   },
   "repository": {
     "type": "git",
